@@ -1,0 +1,9 @@
+Discussion of design for a multisocket game lobby
+
+1. Server maintains an array of active game sessions
+    a. each active game maintains an array of Websocket connections for the various clients
+    b. If a client disconnects, we can hold onto their information for a set time to allow them
+       to reconnect to their game if needed
+2. when a client loads the lobby they get a list of all available servers to connect to
+    a. when they select a server, the webserver will initialize a websocket for them and 
+       add them to the array of connections for that lobby 
