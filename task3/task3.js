@@ -59,7 +59,7 @@ function calculateRemaining(users, sessions){
                 if(user[sessionType] > 0){
                     user[sessionType] -= 1; //Decrement from the existing count
                 } else {
-                    console.log("User " + user.name + " has no more " + session.type + "s left!");
+                    console.log("User " + user.name + " has no " + session.type + "s left!");
                 }
             } catch(e){
                 console.error("Invalid")
@@ -70,20 +70,23 @@ function calculateRemaining(users, sessions){
     return true; //Potential success/failure modes
 }
 
-//Step 1: Get user and session data
-//  1a: Process user data to more useful form
+
+//Code to demonstrate functions
+//asyncronously get data
 var users, sessions;
-var users_raw = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3/users')
-var sessions = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3/sessions')
+var users_promise = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3/users')
+var sessions_promise = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3/sessions')
 
 //wait for all promises to complete
-Promise.all([users_raw, sessions])
+Promise.all([users_promise, sessions_promise])
     .then((values) => {
         users = values[0]["users"];
         sessions = values[1]["sessions"]
+        //Update users structure to contain session and mock counts
         calculateRemaining(users, sessions)    
         users.forEach((user) => { 
-            console.log(`User ${user.name} has ${user.sessions} sessions and ${user.mocks} mocks remaining`)
+            var countString = `<div>User ${user.name} has ${user.sessions} sessions and ${user.mocks} mocks remaining</div>`;
+            document.getElementById("remaining-counts").innerHTML += countString; 
         })
     })
 
