@@ -7,7 +7,6 @@
 async function getJsonData(url){
     var data = await fetch(url)
     .then(response => response.json());
-
     return data;
 };
 
@@ -24,58 +23,67 @@ async function getJsonData(url){
 
  */
 function calculateRemaining(users, sessions){
-    //Define the possible types for the records
-    //Determine initial counts for each user
-    data.forEach(user => {
-        user["Session"] = 0; 
-        user["Mock"] = 0;
-
+    //Define the possible types for the records; this guarentees we only look for valid types
+    const _session_types = Object.freeze({"Session":"sessions", "Mock":"mocks"})
+    //Initialize user counts
+    users.forEach(user => {
+        user["sessions"] = 0; 
+        user["mocks"] = 0;
+        user["purchased"].forEach((purchase) => {
+            if("sessions" in purchase){
+                user["sessions"] += purchase["sessions"]
+            }
+            if("mocks" in purchase){
+                user["mocks"] += purchase["mocks"]
+            }
+        })
     })
 
     //Iterate through each session in the sessions data
     sessions.forEach((session) => {
-        if(!session.hasOwnProperty("visits")){
+        if(!("visits" in session)){
             return; //No visitors so nothing to do
         }
 
-        if(!session.hasOwnProperty("type")){
+        if(!("type" in session)){
             console.error("Session has no type!");
             return; //Skip to next element of forEach
         }
 
-        var sessionType = _sessionTypes[session.type];
-
         //Attempt to update counts; Handles errors where id is not defined
+        var sessionType = _session_types[session.type];
         session.visits.forEach((visitorID) => {
             try {
-                var user = users.find(user => user._id === visitorID)[0];
-                console.log("USER: ", user)
-                user[sessionType] -= 1; //Decrement from the existing count
+                var user = users.find(user => user._id === visitorID);
+                //Validate the user has enough to decrement
+                if(user[sessionType] > 0){
+                    user[sessionType] -= 1; //Decrement from the existing count
+                } else {
+                    console.log("User " + user.name + " has no more " + session.type + "s left!");
+                }
             } catch(e){
                 console.error("Invalid")
             }
         })
-
     })
+
+    return true; //Potential success/failure modes
 }
 
 //Step 1: Get user and session data
 //  1a: Process user data to more useful form
-var users; //Final object to store _id, name, sessions, mocks
+var users, sessions;
 var users_raw = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3/users')
-
 var sessions = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3/sessions')
 
 //wait for all promises to complete
-Promise.all([users_raw, sessions]).then(
-    (values) => console.log(values)
-)
-
-//Step 2: Build User object with current counts for all users
-
-//Step 2: Update user counts depending on session records
-
-
-//Step 3: Print out the functions
-//document.getElementById("records-remaining").innerHTML("")
+Promise.all([users_raw, sessions])
+    .then((values) => {
+        users = values[0]["users"];
+        sessions = values[1]["sessions"]
+        calculateRemaining(users, sessions)    
+        users.forEach((user) => { 
+            console.log(`User ${user.name} has ${user.sessions} sessions and ${user.mocks} mocks remaining`)
+        })
+    })
 
