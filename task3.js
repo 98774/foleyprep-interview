@@ -5,25 +5,32 @@
             type: String
 */
 async function getJsonData(url){
-    return await fetch(url)
-    .then(response => response.json())
+    var data = await fetch(url)
+    .then(response => response.json());
+
+    return data;
 };
 
 //Part 2: Function to calculate remain sessions and mocks 
 /*
     Parameters:
-        users: A list of user ids
-            type: Array
+        users: A list of user objects 
+            type: Array[Object]
         sessions: A list of session objects 
-            type: Object
+            type: Array[Object]
     
     Returns: An object containing user ids, and session and mock counts
-        type: Object
+        type: Array[Object]
 
  */
 function calculateRemaining(users, sessions){
     //Define the possible types for the records
-    const _sessionTypes = Object.freeze({"Mock":"mocks", "Session": "sessions"});
+    //Determine initial counts for each user
+    data.forEach(user => {
+        user["Session"] = 0; 
+        user["Mock"] = 0;
+
+    })
 
     //Iterate through each session in the sessions data
     sessions.forEach((session) => {
@@ -53,24 +60,16 @@ function calculateRemaining(users, sessions){
 }
 
 //Step 1: Get user and session data
+//  1a: Process user data to more useful form
 var users; //Final object to store _id, name, sessions, mocks
 var users_raw = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3/users')
-    .then((data) => {
-        data.forEach(user => {
 
-        })
-    })
+var sessions = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3/sessions')
 
-
-var users
-//Determine starting counts for each user
-
-
-var users = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3/sessions')
-    .then((data) => {
-        console.log(data)
-    })
-
+//wait for all promises to complete
+Promise.all([users_raw, sessions]).then(
+    (values) => console.log(values)
+)
 
 //Step 2: Build User object with current counts for all users
 
@@ -78,5 +77,5 @@ var users = getJsonData('https://dev.foleyprep.com/interview/2023/november/task3
 
 
 //Step 3: Print out the functions
-document.getElementById("records-remaining").innerHTML("")
+//document.getElementById("records-remaining").innerHTML("")
 
