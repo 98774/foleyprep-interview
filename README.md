@@ -4,7 +4,11 @@ This repository contains my (Jonathon Snyder) submission for the Foley Prep Deve
 
 Tasks Completed:
 
-2. All writing and diagrams are located in task2_websockets.pdf
+2. All writing and diagrams are located in the task2 folder.
+    .A pdf copy is available as task2_websockets.pdf
+    .A text only copy is available as task2.txt 
+        Associated images are in the task2 folder
+        Image names are referenced at appropriate points in task2.txt 
 
 3. All resources are located under the folder task3 
     .All code for this task is contained in task3.js and task3.html
